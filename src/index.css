@@ -1,0 +1,544 @@
+/* ── Fonts ── */
+@import url('https://fonts.googleapis.com/css2?family=Caveat+Brush&family=MedievalSharp&display=swap');
+
+/* ── Tailwind ── */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ── Reset / Root ── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --parchment: #fdf6e3;
+  --parchment-dark: #f0e0b8;
+  --ink: #3a2410;
+  --ink-mid: #7a5c38;
+  --ink-light: #a8895a;
+  --green: #15803d;
+  --blue: #1d4ed8;
+  --bg: #1a0f00;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  background: var(--bg);
+  display: flex;
+  place-items: center;
+  justify-content: center;
+  overflow-x: hidden;
+}
+
+#root {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* ── App layout ── */
+.app-root {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-height: 100vh;
+  padding: 2rem 1rem 3rem;
+  position: relative;
+}
+
+.bg-texture {
+  position: fixed;
+  inset: 0;
+  background:
+    radial-gradient(ellipse at 20% 20%, #3a1a0044 0%, transparent 60%),
+    radial-gradient(ellipse at 80% 80%, #1a0a3044 0%, transparent 60%),
+    url("https://www.transparenttextures.com/patterns/dark-wood.png");
+  z-index: 0;
+  pointer-events: none;
+}
+
+.app-root > * { position: relative; z-index: 1; }
+
+/* ── Header ── */
+.app-header { text-align: center; margin-bottom: 1.5rem; }
+
+.app-title {
+  font-family: 'MedievalSharp', cursive;
+  font-size: 2.5rem;
+  color: #f5d78e;
+  text-shadow: 0 0 30px #f5a62388, 0 2px 4px #00000088;
+  letter-spacing: 0.05em;
+}
+
+.app-subtitle {
+  font-family: 'Caveat Brush', cursive;
+  color: #a8895a;
+  font-size: 1.1rem;
+  margin-top: 0.25rem;
+}
+
+/* ── Search ── */
+.search-row {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 0.75rem;
+  width: 100%;
+  max-width: 380px;
+}
+
+.search-input {
+  flex: 1;
+  padding: 0.6rem 1rem;
+  border-radius: 10px;
+  border: 2px solid #7a5c3888;
+  background: #fdf6e3ee;
+  font-family: 'Caveat Brush', cursive;
+  font-size: 1.1rem;
+  color: var(--ink);
+  outline: none;
+  transition: border-color 0.2s;
+}
+.search-input:focus { border-color: #b45309; }
+.search-input::placeholder { color: #a8895a; }
+.search-input:disabled { opacity: 0.6; }
+
+.search-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.6rem 1.2rem;
+  border-radius: 10px;
+  border: none;
+  background: #92400e;
+  color: #fdf6e3;
+  font-family: 'MedievalSharp', cursive;
+  font-size: 0.95rem;
+  cursor: pointer;
+  transition: background 0.2s, transform 0.1s;
+  white-space: nowrap;
+}
+.search-btn:hover:not(:disabled) { background: #78350f; }
+.search-btn:active:not(:disabled) { transform: scale(0.97); }
+.search-btn:disabled { opacity: 0.6; cursor: not-allowed; }
+
+.spin { animation: spin 0.8s linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* ── Error ── */
+.error-banner {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: #7f1d1d99;
+  color: #fca5a5;
+  border: 1px solid #ef444444;
+  border-radius: 8px;
+  padding: 0.5rem 1rem;
+  font-family: 'Caveat Brush', cursive;
+  font-size: 1rem;
+  max-width: 380px;
+  margin-bottom: 0.75rem;
+}
+
+/* ── Card Stage ── */
+.card-stage {
+  position: relative;
+  min-height: 560px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+}
+
+/* ── Card Animator — handles pull/exit transitions ── */
+.card-animator {
+  transform-origin: top center;
+}
+
+/* Card flies in from above */
+@keyframes pullIn {
+  0%   { opacity: 0; transform: translateY(-120px) rotate(-8deg) scale(0.85); }
+  60%  { transform: translateY(12px) rotate(1.5deg) scale(1.02); }
+  80%  { transform: translateY(-6px) rotate(-0.5deg) scale(0.99); }
+  100% { opacity: 1; transform: translateY(0) rotate(0deg) scale(1); }
+}
+
+/* Card flies back out */
+@keyframes pullOut {
+  0%   { opacity: 1; transform: translateY(0) rotate(0deg) scale(1); }
+  100% { opacity: 0; transform: translateY(-100px) rotate(6deg) scale(0.85); }
+}
+
+.state-pulling  { animation: pullIn 0.65s cubic-bezier(0.34, 1.56, 0.64, 1) forwards; }
+.state-landed   { animation: none; opacity: 1; transform: none; }
+.state-flipped  { animation: none; opacity: 1; transform: none; }
+.state-exiting  { animation: pullOut 0.4s ease-in forwards; }
+.state-fetching { opacity: 0; }
+
+/* ── Tilt wrapper ── */
+.tilt-wrapper {
+  border-radius: 18px;
+  display: block;
+}
+
+/* ── RPG Card ── */
+.rpg-card {
+  width: 300px;
+  height: 520px;
+  position: relative;
+  cursor: pointer;
+  border-radius: 18px;
+  filter: drop-shadow(0 0 18px var(--glow-color, #9ca3af44));
+}
+
+/* ── Holographic sheen ── */
+.holo-sheen {
+  position: absolute;
+  inset: 0;
+  border-radius: 18px;
+  z-index: 10;
+  pointer-events: none;
+  background: linear-gradient(
+    135deg,
+    transparent 30%,
+    rgba(255, 255, 200, 0.06) 45%,
+    rgba(200, 255, 255, 0.08) 55%,
+    transparent 70%
+  );
+  mix-blend-mode: screen;
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+.rpg-card:hover .holo-sheen { opacity: 1; }
+
+/* ── Card faces — visibility swap instead of 3D flip ── */
+.face {
+  position: absolute;
+  inset: 0;
+  border-radius: 255px 15px 225px 15px / 15px 225px 15px 255px;
+  overflow: hidden;
+  background: var(--parchment);
+  border: 3px solid #7a5c3888;
+  transition: opacity 0.35s ease, transform 0.35s ease;
+}
+
+.face::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: url("https://www.transparenttextures.com/patterns/cream-paper.png");
+  opacity: 0.5;
+  pointer-events: none;
+  border-radius: inherit;
+}
+
+.face-visible {
+  opacity: 1;
+  transform: scale(1);
+  pointer-events: auto;
+  z-index: 2;
+}
+
+.face-hidden {
+  opacity: 0;
+  transform: scale(0.94);
+  pointer-events: none;
+  z-index: 1;
+}
+
+/* ── Card inner ── */
+.card-inner {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  height: 100%;
+  padding: 14px 14px 10px;
+  overflow: hidden;
+}
+
+/* ── Rarity badge ── */
+.rarity-badge {
+  font-family: 'MedievalSharp', cursive;
+  font-size: 9px;
+  letter-spacing: 0.08em;
+  border: 1px solid;
+  border-radius: 20px;
+  padding: 2px 10px;
+  margin-bottom: 8px;
+  background: rgba(255,255,255,0.5);
+}
+
+/* ── Avatar ── */
+.avatar-wrap {
+  position: relative;
+  width: 76px;
+  height: 76px;
+  margin-bottom: 4px;
+  flex-shrink: 0;
+}
+.avatar-img {
+  width: 76px;
+  height: 76px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid #7a5c3888;
+}
+.avatar-ring {
+  position: absolute;
+  top: -4px; left: -4px;
+  width: calc(100% + 8px);
+  height: calc(100% + 8px);
+  animation: ringWiggle 3s linear infinite;
+}
+@keyframes ringWiggle {
+  to { stroke-dashoffset: -24; }
+}
+
+/* ── Name / class ── */
+.specialty-title {
+  font-family: 'Caveat Brush', cursive;
+  font-size: 11px;
+  color: var(--ink-mid);
+  margin-bottom: 1px;
+}
+.hero-name {
+  font-family: 'MedievalSharp', cursive;
+  font-size: 1.15rem;
+  color: var(--ink);
+  line-height: 1.2;
+  text-align: center;
+}
+.hero-handle {
+  font-family: 'Caveat Brush', cursive;
+  font-size: 11px;
+  color: var(--ink-light);
+  margin-bottom: 3px;
+}
+.account-age {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-family: 'Caveat Brush', cursive;
+  font-size: 10px;
+  color: var(--ink-mid);
+  margin-bottom: 6px;
+}
+
+/* ── Divider ── */
+.divider {
+  width: 100%;
+  height: 1px;
+  background: repeating-linear-gradient(90deg, #7a5c3844 0px, #7a5c3844 4px, transparent 4px, transparent 8px);
+  margin: 5px 0;
+  flex-shrink: 0;
+}
+
+/* ── HP / Mana bars ── */
+.bars { width: 100%; margin-bottom: 5px; display: flex; flex-direction: column; gap: 4px; }
+
+.bar-row {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-family: 'Caveat Brush', cursive;
+  font-size: 11px;
+  color: var(--ink);
+}
+.bar-icon.green { color: #15803d; }
+.bar-icon.blue  { color: #1d4ed8; }
+.bar-label { width: 18px; flex-shrink: 0; }
+.bar-track {
+  flex: 1;
+  height: 10px;
+  background: #e8d5b0;
+  border: 1.5px solid #7a5c38;
+  border-radius: 20px 5px 15px 3px / 4px 12px 5px 12px;
+  overflow: hidden;
+}
+.bar-fill {
+  height: 100%;
+  transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+  border-radius: inherit;
+}
+.bar-fill.green { background: repeating-linear-gradient(45deg, #15803d, #15803d 3px, #16a34a 3px, #16a34a 6px); }
+.bar-fill.blue  { background: repeating-linear-gradient(45deg, #1d4ed8, #1d4ed8 3px, #2563eb 3px, #2563eb 6px); }
+.bar-val { font-size: 10px; color: var(--ink-mid); min-width: 28px; text-align: right; }
+
+/* ── Weapon ── */
+.weapon-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-family: 'Caveat Brush', cursive;
+  font-size: 11px;
+  font-style: italic;
+  color: var(--ink);
+  background: #f5e6c888;
+  border: 1px dashed #7a5c3866;
+  border-radius: 6px;
+  padding: 3px 8px;
+  margin-bottom: 5px;
+  width: 100%;
+  justify-content: center;
+}
+
+/* ── Badges ── */
+.badges {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 4px;
+  margin-bottom: 5px;
+}
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  font-family: 'Caveat Brush', cursive;
+  font-size: 10px;
+  padding: 2px 7px;
+  border: 1px solid;
+  border-radius: 20px;
+  background: rgba(255,255,255,0.5);
+}
+
+/* ── Special moves ── */
+.moves-box {
+  width: 100%;
+  background: #f5e6c866;
+  border: 1px dashed #7a5c3866;
+  border-radius: 6px;
+  padding: 5px 8px;
+  margin-bottom: 4px;
+}
+.moves-title {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-family: 'MedievalSharp', cursive;
+  font-size: 9px;
+  color: var(--ink);
+  margin-bottom: 3px;
+}
+.move-item {
+  font-family: 'Caveat Brush', cursive;
+  font-size: 10px;
+  color: var(--ink-mid);
+  line-height: 1.5;
+}
+
+/* ── Flip hint ── */
+.flip-hint {
+  font-family: 'Caveat Brush', cursive;
+  font-size: 9px;
+  color: var(--ink-light);
+  margin-top: auto;
+  padding-top: 4px;
+}
+
+/* ── Back face ── */
+.back-title {
+  font-family: 'MedievalSharp', cursive;
+  font-size: 1rem;
+  color: var(--ink);
+  margin-bottom: 4px;
+  text-align: center;
+}
+
+/* ── Stats grid (back) ── */
+.stats-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 6px;
+  width: 100%;
+  margin-top: 6px;
+}
+.stat-cell {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  background: #f5e6c888;
+  border: 1px solid #7a5c3844;
+  border-radius: 8px;
+  padding: 6px 4px;
+  color: var(--ink-mid);
+}
+.stat-num {
+  font-family: 'MedievalSharp', cursive;
+  font-size: 1rem;
+  color: var(--ink);
+  line-height: 1;
+}
+.stat-lbl {
+  font-family: 'Caveat Brush', cursive;
+  font-size: 10px;
+  color: var(--ink-light);
+}
+
+/* ── Action buttons ── */
+.action-row {
+  display: flex;
+  gap: 0.5rem;
+  margin-top: 1rem;
+}
+.action-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.5rem 1.1rem;
+  border-radius: 8px;
+  border: 1.5px solid #7a5c3888;
+  background: #fdf6e3cc;
+  color: var(--ink);
+  font-family: 'Caveat Brush', cursive;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background 0.15s, transform 0.1s;
+}
+.action-btn:hover { background: #f5e6c8; }
+.action-btn:active { transform: scale(0.97); }
+
+/* ── Particles ── */
+.particles-wrap {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  pointer-events: none;
+  z-index: 20;
+}
+.particle {
+  position: absolute;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #f5d78e;
+  animation: burst 0.8s ease-out forwards;
+  animation-delay: calc(var(--i) * 0.03s);
+  transform-origin: center;
+}
+.particle:nth-child(odd)  { background: #d97706; }
+.particle:nth-child(3n)   { background: #f0abfc; width: 4px; height: 4px; }
+.particle:nth-child(4n)   { background: #7dd3fc; }
+
+@keyframes burst {
+  0%   { opacity: 1; transform: translate(0, 0) scale(1); }
+  100% {
+    opacity: 0;
+    transform:
+      translate(
+        calc(cos(calc(var(--i) * 22.5deg)) * 80px),
+        calc(sin(calc(var(--i) * 22.5deg)) * 80px)
+      )
+      scale(0.2);
+  }
+}
+
+/* ── Responsive ── */
+@media (max-width: 400px) {
+  .rpg-card { width: 270px; height: 480px; }
+  .app-title { font-size: 2rem; }
+}
