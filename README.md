@@ -67,4 +67,5 @@ Note on API Limits: This app uses unauthenticated requests to the GitHub API, wh
 🧙‍♂️ Author
 Built by LunaeQuinx.
 
-If you like this project, consider giving it a ⭐ on GitHub and sharing your generated card on LinkedIn/X!
+If you like this project, consider giving it a ⭐ on GitHub and sharing your generated card on LinkedIn!
+www.linkedin.com/in/syfqhmdni
